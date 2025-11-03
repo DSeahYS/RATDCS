@@ -1,1 +1,1 @@
-"""RATDCS Detection Module."""\n
+"""RATDCS Detection Module."""

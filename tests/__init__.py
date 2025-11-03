@@ -1,1 +1,1 @@
-"""RATDCS Test Suite."""
+"""RATDCS Tests Module."""

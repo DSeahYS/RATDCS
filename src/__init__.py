@@ -1,1 +1,1 @@
-"""RATDCS Src Module."""\n
+"""RATDCS Src Module."""
