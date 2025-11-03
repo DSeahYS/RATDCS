@@ -1,0 +1,45 @@
+# Dockerfile for RATDCS Space Debris Collision Predictor Service
+# CPU-optimized for HMM + BNN models
+
+FROM ubuntu:22.04 as base
+
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3-pip \
+    python3-dev \
+    git \
+    curl \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+FROM base as dependencies
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+
+FROM dependencies as application
+
+COPY src/ /app/src/
+COPY models/debris_predictor/ /app/models/debris_predictor/
+COPY config/ /app/config/
+
+RUN useradd -m -u 1000 ratdcs && chown -R ratdcs:ratdcs /app
+USER ratdcs
+
+ENV PYTHONPATH=/app
+ENV HMM_MODEL_PATH=/app/models/debris_predictor/hmm_v1.pkl
+ENV BNN_MODEL_PATH=/app/models/debris_predictor/bnn_v1.h5
+ENV MONTE_CARLO_SAMPLES=100
+ENV PREDICTION_HORIZON_HOURS=72
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python3 -c "import sys; sys.exit(0)"
+
+EXPOSE 50051 8080
+
+CMD ["python3", "-m", "src.detection.debris.predictor"]

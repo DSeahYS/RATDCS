@@ -1,0 +1,42 @@
+# RATDCS Kubernetes Namespaces
+# Based on ARCHITECTURE.md Section 6 - Deployment Architecture
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ratdcs-ingestion
+  labels:
+    name: ratdcs-ingestion
+    component: ingestion
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ratdcs-detection
+  labels:
+    name: ratdcs-detection
+    component: detection
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ratdcs-decision
+  labels:
+    name: ratdcs-decision
+    component: decision
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ratdcs-storage
+  labels:
+    name: ratdcs-storage
+    component: storage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ratdcs-monitoring
+  labels:
+    name: ratdcs-monitoring
+    component: monitoring

@@ -1,0 +1,228 @@
+# RATDCS Production Configuration
+# Overrides default.yaml for production deployment
+
+system:
+  environment: "production"
+  log_level: "WARNING"
+
+# Production Detection Services
+detection:
+  asteroid:
+    batch_size: 64
+    max_queue_size: 5000
+    gpu_memory_fraction: 0.95
+    
+  exoplanet:
+    batch_size: 128
+    
+  debris:
+    prediction_horizon_hours: 72
+    monte_carlo_samples: 200
+
+# Production Decision Services
+decision:
+  rl_controller:
+    action_frequency_hz: 50
+    
+  fault_tolerant:
+    detection_latency_ms: 50
+    reconfiguration_timeout_s: 3
+
+# Production Kafka Configuration
+kafka:
+  bootstrap_servers:
+    - "kafka-broker-1.ratdcs.svc.cluster.local:9092"
+    - "kafka-broker-2.ratdcs.svc.cluster.local:9092"
+    - "kafka-broker-3.ratdcs.svc.cluster.local:9092"
+  consumer_group: "ratdcs-production"
+  max_poll_interval_ms: 600000
+  session_timeout_ms: 30000
+  enable_auto_commit: false
+  compression_type: "snappy"
+  
+rabbitmq:
+  host: "rabbitmq.ratdcs.svc.cluster.local"
+  port: 5672
+  connection_attempts: 5
+  retry_delay: 5
+
+# Production Database Configuration
+database:
+  postgresql:
+    host: "postgres-ha.ratdcs.svc.cluster.local"
+    port: 5432
+    pool_size: 50
+    max_overflow: 20
+    pool_pre_ping: true
+    echo: false
+    
+  influxdb:
+    url: "http://influxdb.ratdcs.svc.cluster.local:8086"
+    timeout: 10000
+    
+  redis:
+    host: "redis-cluster.ratdcs.svc.cluster.local"
+    port: 6379
+    socket_timeout: 10
+    socket_connect_timeout: 10
+    retry_on_timeout: true
+    max_connections: 100
+
+# Production API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 16
+  reload: false
+  access_log: true
+  cors_origins:
+    - "https://ratdcs.example.com"
+    - "https://dashboard.ratdcs.example.com"
+  rate_limit_per_minute: 5000
+  max_request_size_mb: 50
+
+# Production gRPC Configuration
+grpc:
+  server_port: 50051
+  max_workers: 50
+  max_message_length_mb: 200
+
+# Production Monitoring
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    scrape_interval_s: 10
+    
+  jaeger:
+    enabled: true
+    agent_host: "jaeger-agent.ratdcs.svc.cluster.local"
+    agent_port: 6831
+    sampler_type: "probabilistic"
+    sampler_param: 0.5
+    
+  grafana:
+    enabled: true
+    port: 3000
+
+# Production Performance Targets (stricter)
+performance:
+  latency_targets_ms:
+    asteroid_detector: 150
+    exoplanet_classifier: 250
+    debris_predictor: 350
+    rl_controller: 30
+    fault_detection: 75
+    end_to_end_pipeline: 400
+
+# Production Logging
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    json:
+      format: '{"timestamp": "%(asctime)s", "service": "ratdcs", "level": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s", "trace_id": "%(trace_id)s", "span_id": "%(span_id)s"}'
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      level: "WARNING"
+      formatter: "json"
+      stream: "ext://sys.stdout"
+    file:
+      class: "logging.handlers.RotatingFileHandler"
+      level: "INFO"
+      formatter: "json"
+      filename: "/var/log/ratdcs/production.log"
+      maxBytes: 52428800  # 50MB
+      backupCount: 10
+    error_file:
+      class: "logging.handlers.RotatingFileHandler"
+      level: "ERROR"
+      formatter: "json"
+      filename: "/var/log/ratdcs/error.log"
+      maxBytes: 52428800
+      backupCount: 10
+  loggers:
+    ratdcs:
+      level: "INFO"
+      handlers: ["console", "file", "error_file"]
+      propagate: false
+  root:
+    level: "WARNING"
+    handlers: ["console"]
+
+# Production Security
+security:
+  jwt_secret_key: "${JWT_SECRET_KEY}"
+  jwt_algorithm: "HS256"
+  jwt_expiration_minutes: 30
+  api_key_enabled: true
+  tls_enabled: true
+  tls_cert_path: "/etc/ratdcs/certs/tls.crt"
+  tls_key_path: "/etc/ratdcs/certs/tls.key"
+  require_https: true
+
+# Production Data Pipeline
+data_pipeline:
+  preprocessing:
+    normalize: true
+    augmentation_enabled: false
+    cache_enabled: true
+    prefetch_buffer_size: 50
+  validation:
+    split_ratio: [0.8, 0.1, 0.1]
+    shuffle_buffer_size: 50000
+    random_seed: 42
+
+# High Availability Settings
+high_availability:
+  health_check_interval_s: 10
+  health_check_timeout_s: 5
+  max_retries: 3
+  circuit_breaker_enabled: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_timeout_s: 60
+
+# Resource Limits
+resources:
+  asteroid_detector:
+    cpu_request: "2"
+    cpu_limit: "4"
+    memory_request: "8Gi"
+    memory_limit: "16Gi"
+    gpu_request: "1"
+    gpu_limit: "1"
+    replicas: 3
+    
+  exoplanet_classifier:
+    cpu_request: "2"
+    cpu_limit: "4"
+    memory_request: "8Gi"
+    memory_limit: "16Gi"
+    gpu_request: "1"
+    gpu_limit: "1"
+    replicas: 2
+    
+  debris_predictor:
+    cpu_request: "4"
+    cpu_limit: "8"
+    memory_request: "4Gi"
+    memory_limit: "8Gi"
+    replicas: 4
+    
+  rl_controller:
+    cpu_request: "4"
+    cpu_limit: "8"
+    memory_request: "16Gi"
+    memory_limit: "32Gi"
+    gpu_request: "1"
+    gpu_limit: "1"
+    replicas: 1
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  s3_bucket: "ratdcs-backups-prod"
+  s3_region: "us-east-1"

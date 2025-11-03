@@ -1,0 +1,157 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ratdcs"
+version = "1.0.0"
+description = "Real-Time Asteroid Threat Detection & Collision-Avoidance System"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "RATDCS Team", email = "ratdcs-support@example.com"}
+]
+maintainers = [
+    {name = "RATDCS Team", email = "ratdcs-support@example.com"}
+]
+keywords = [
+    "astronomy",
+    "asteroid-detection",
+    "space-debris",
+    "machine-learning",
+    "deep-learning",
+    "reinforcement-learning",
+    "collision-avoidance",
+    "orbital-mechanics"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
+Homepage = "https://github.com/organization/ratdcs"
+Documentation = "https://docs.ratdcs.org"
+Repository = "https://github.com/organization/ratdcs"
+"Bug Tracker" = "https://github.com/organization/ratdcs/issues"
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | data
+  | models
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip_glob = ["data/*", "models/*", "*.ipynb"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tensorflow.*",
+    "torch.*",
+    "lightgbm.*",
+    "poliastro.*",
+    "astropy.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "validation: marks tests as model validation tests",
+    "performance: marks tests as performance tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+    "*/conftest.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+]
+
+[tool.pylint.messages_control]
+max-line-length = 100
+disable = [
+    "C0103",  # Invalid name
+    "C0114",  # Missing module docstring
+    "R0913",  # Too many arguments
+    "R0914",  # Too many local variables
+]
+
+[tool.pylint.design]
+max-args = 10
+max-attributes = 12
+max-public-methods = 25

@@ -1,0 +1,45 @@
+# Dockerfile for RATDCS Exoplanet Classification Service
+# Multi-stage build for optimized image size
+
+FROM nvidia/cuda:12.2.0-cudnn8-runtime-ubuntu22.04 as base
+
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3-pip \
+    python3-dev \
+    git \
+    curl \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+FROM base as dependencies
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+
+FROM dependencies as application
+
+COPY src/ /app/src/
+COPY models/exoplanet_classifier/ /app/models/exoplanet_classifier/
+COPY config/ /app/config/
+
+RUN useradd -m -u 1000 ratdcs && chown -R ratdcs:ratdcs /app
+USER ratdcs
+
+ENV PYTHONPATH=/app
+ENV LIGHTGBM_MODEL_PATH=/app/models/exoplanet_classifier/lightgbm_v1.pkl
+ENV CNN_MODEL_PATH=/app/models/exoplanet_classifier/cnn_v1.h5
+ENV BATCH_SIZE=64
+ENV GPU_MEMORY_FRACTION=0.8
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python3 -c "import sys; sys.exit(0)"
+
+EXPOSE 50051 8080
+
+CMD ["python3", "-m", "src.detection.exoplanet.classifier"]

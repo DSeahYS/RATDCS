@@ -1,0 +1,243 @@
+# RATDCS Default Configuration
+# Based on ARCHITECTURE.md - Production-Ready Settings
+
+system:
+  name: "RATDCS"
+  version: "1.0.0"
+  environment: "default"
+  log_level: "INFO"
+
+# Detection Services Configuration
+detection:
+  asteroid:
+    model_path: "models/asteroid_detector/cnn_v1.h5"
+    confidence_threshold: 0.85
+    batch_size: 32
+    max_queue_size: 1000
+    inference_timeout_ms: 200
+    gpu_memory_fraction: 0.8
+    
+  exoplanet:
+    lightgbm_model_path: "models/exoplanet_classifier/lightgbm_v1.pkl"
+    cnn_model_path: "models/exoplanet_classifier/cnn_v1.h5"
+    confidence_threshold: 0.90
+    batch_size: 64
+    inference_timeout_ms: 300
+    auc_target: 0.94
+    
+  debris:
+    hmm_model_path: "models/debris_predictor/hmm_v1.pkl"
+    bnn_model_path: "models/debris_predictor/bnn_v1.h5"
+    risk_threshold: 0.1
+    prediction_horizon_hours: 72
+    inference_timeout_ms: 400
+    monte_carlo_samples: 100
+
+# Decision & Control Configuration
+decision:
+  rl_controller:
+    policy_path: "models/rl_controller/ppo_policy_v1.zip"
+    action_frequency_hz: 20
+    control_timeout_ms: 50
+    collision_avoidance_success_rate: 0.95
+    fuel_efficiency_tolerance: 0.15
+    
+  fault_tolerant:
+    fault_detection_threshold: 0.05
+    detection_latency_ms: 100
+    reconfiguration_timeout_s: 5
+    graceful_degradation_factor: 0.60
+    
+  threat_fusion:
+    risk_aggregation_method: "weighted_average"
+    priority_ranking_enabled: true
+    uncertainty_estimation_enabled: true
+
+# Message Queue Configuration
+kafka:
+  bootstrap_servers:
+    - "localhost:9092"
+  topics:
+    raw_images: "raw_images"
+    light_curves: "light_curves"
+    debris_tracks: "debris_tracks"
+    threat_detections: "threat_detections"
+    risk_assessments: "risk_assessments"
+    control_commands: "control_commands"
+  consumer_group: "ratdcs-consumers"
+  max_poll_interval_ms: 300000
+  session_timeout_ms: 10000
+  auto_offset_reset: "earliest"
+  
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  username: "ratdcs"
+  password: "${RABBITMQ_PASSWORD}"
+  virtual_host: "ratdcs"
+
+# Database Configuration
+database:
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "ratdcs"
+    username: "ratdcs"
+    password: "${POSTGRES_PASSWORD}"
+    pool_size: 20
+    max_overflow: 10
+    
+  influxdb:
+    url: "http://localhost:8086"
+    org: "ratdcs"
+    bucket: "telemetry"
+    token: "${INFLUXDB_TOKEN}"
+    
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: "${REDIS_PASSWORD}"
+    socket_timeout: 5
+    socket_connect_timeout: 5
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  cors_enabled: true
+  cors_origins:
+    - "http://localhost:3000"
+    - "https://ratdcs.example.com"
+  rate_limit_per_minute: 1000
+  max_request_size_mb: 10
+
+# gRPC Configuration
+grpc:
+  server_port: 50051
+  max_workers: 10
+  max_message_length_mb: 100
+  keepalive_time_ms: 60000
+  keepalive_timeout_ms: 20000
+
+# Monitoring Configuration
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    metrics_path: "/metrics"
+    scrape_interval_s: 15
+    
+  jaeger:
+    enabled: true
+    agent_host: "localhost"
+    agent_port: 6831
+    sampler_type: "probabilistic"
+    sampler_param: 0.1
+    
+  grafana:
+    enabled: true
+    port: 3000
+    admin_user: "admin"
+    admin_password: "${GRAFANA_PASSWORD}"
+
+# Performance Targets
+performance:
+  latency_targets_ms:
+    asteroid_detector: 200
+    exoplanet_classifier: 300
+    debris_predictor: 400
+    rl_controller: 50
+    fault_detection: 100
+    end_to_end_pipeline: 500
+    
+  throughput_targets:
+    asteroid_detector_fps: 10
+    exoplanet_classifier_per_min: 50
+    debris_predictor_per_min: 100
+    rl_controller_hz: 20
+    api_requests_per_sec: 1000
+    
+  accuracy_targets:
+    asteroid_precision: 0.90
+    asteroid_recall: 0.85
+    exoplanet_auc: 0.94
+    debris_calibration_ece: 0.10
+    rl_success_rate: 0.95
+
+# Logging Configuration
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    standard:
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    json:
+      format: '{"time": "%(asctime)s", "name": "%(name)s", "level": "%(levelname)s", "message": "%(message)s"}'
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      level: "INFO"
+      formatter: "standard"
+      stream: "ext://sys.stdout"
+    file:
+      class: "logging.handlers.RotatingFileHandler"
+      level: "DEBUG"
+      formatter: "json"
+      filename: "data/logs/ratdcs.log"
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+  loggers:
+    ratdcs:
+      level: "INFO"
+      handlers: ["console", "file"]
+      propagate: false
+  root:
+    level: "INFO"
+    handlers: ["console"]
+
+# Security Configuration
+security:
+  jwt_secret_key: "${JWT_SECRET_KEY}"
+  jwt_algorithm: "HS256"
+  jwt_expiration_minutes: 60
+  api_key_enabled: true
+  tls_enabled: false
+  tls_cert_path: ""
+  tls_key_path: ""
+
+# Data Pipeline Configuration
+data_pipeline:
+  preprocessing:
+    normalize: true
+    augmentation_enabled: false
+    cache_enabled: true
+    prefetch_buffer_size: 10
+  validation:
+    split_ratio: [0.8, 0.1, 0.1]  # train, val, test
+    shuffle_buffer_size: 10000
+    random_seed: 42
+
+# Model Training Configuration (for reference)
+training:
+  asteroid_detector:
+    optimizer: "adam"
+    learning_rate: 0.0001
+    batch_size: 32
+    epochs: 100
+    early_stopping_patience: 10
+    
+  exoplanet_classifier:
+    lightgbm_learning_rate: 0.05
+    lightgbm_n_estimators: 500
+    cnn_learning_rate: 0.0001
+    
+  rl_controller:
+    gamma: 0.99
+    lambda_gae: 0.95
+    clip_epsilon: 0.2
+    learning_rate: 0.0003
+    batch_size: 256
+    n_epochs: 10

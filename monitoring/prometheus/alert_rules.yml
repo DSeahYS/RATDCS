@@ -1,0 +1,79 @@
+# Prometheus Alert Rules for RATDCS
+
+groups:
+  - name: ratdcs_detection_alerts
+    interval: 30s
+    rules:
+      - alert: HighDetectionLatency
+        expr: detection_latency_ms > 500
+        for: 5m
+        labels:
+          severity: warning
+          component: detection
+        annotations:
+          summary: "High detection latency on {{ $labels.service }}"
+          description: "Detection latency is {{ $value }}ms (threshold: 500ms)"
+
+      - alert: LowDetectionAccuracy
+        expr: detection_accuracy < 0.90
+        for: 10m
+        labels:
+          severity: critical
+          component: detection
+        annotations:
+          summary: "Low detection accuracy on {{ $labels.service }}"
+          description: "Detection accuracy is {{ $value }} (threshold: 0.90)"
+
+      - alert: DetectionServiceDown
+        expr: up{component="detection"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: detection
+        annotations:
+          summary: "Detection service {{ $labels.service }} is down"
+          description: "Service has been down for more than 2 minutes"
+
+  - name: ratdcs_decision_alerts
+    interval: 15s
+    rules:
+      - alert: ControlLatencyExceeded
+        expr: control_latency_ms > 50
+        for: 1m
+        labels:
+          severity: critical
+          component: decision
+        annotations:
+          summary: "Control latency exceeded on {{ $labels.service }}"
+          description: "Control latency is {{ $value }}ms (critical threshold: 50ms)"
+
+      - alert: LowAvoidanceSuccessRate
+        expr: avoidance_success_rate < 0.95
+        for: 5m
+        labels:
+          severity: critical
+          component: decision
+        annotations:
+          summary: "Low avoidance success rate"
+          description: "Success rate is {{ $value }} (threshold: 0.95)"
+
+  - name: ratdcs_system_alerts
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.pod_name }}"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.pod_name }}"
+          description: "CPU usage is {{ $value | humanizePercentage }}"

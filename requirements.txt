@@ -1,0 +1,88 @@
+# RATDCS Core Dependencies
+# Based on ARCHITECTURE.md Section 5.1 - Technology Stack
+
+# Deep Learning & AI
+tensorflow==2.15.0
+torch==2.1.0
+lightgbm==4.1.0
+tensorflow-probability==0.23.0
+optuna==3.5.0
+
+# Reinforcement Learning
+stable-baselines3==2.2.0
+gymnasium==0.29.1
+
+# Scientific Computing
+numpy==1.26.0
+scipy==1.11.0
+pandas==2.1.0
+
+# Astronomy & Orbital Mechanics
+astropy==6.0.0
+poliastro==0.17.0
+
+# Backend & API
+fastapi==0.104.0
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# gRPC & Communication
+grpcio==1.60.0
+grpcio-tools==1.60.0
+protobuf==4.25.0
+
+# Message Queue & Event Streaming
+kafka-python==2.0.2
+pika==1.3.2
+
+# Database & Caching
+redis==5.0.1
+psycopg2-binary==2.9.9
+influxdb-client==1.38.0
+
+# Monitoring & Observability
+prometheus-client==0.19.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+
+# Data Processing
+pillow==10.1.0
+opencv-python==4.8.1.78
+scikit-learn==1.3.2
+scikit-image==0.22.0
+
+# Feature Engineering
+tsfresh==0.20.1
+tqdm==4.66.0
+
+# Data Acquisition
+astroquery==0.4.6
+
+# Utilities
+pyyaml==6.0.1
+python-dotenv==1.0.0
+requests==2.31.0
+aiohttp==3.9.1
+httpx==0.25.2
+
+# Time & Scheduling
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Logging
+structlog==23.2.0
+colorlog==6.8.0
+
+# Model Serving
+onnx==1.15.0
+onnxruntime-gpu==1.16.3
+
+# Security
+cryptography==41.0.7
+pyjwt==2.8.0
+
+# Space Protocols
+spacepy==0.5.0
+ccsdspy==1.2.0

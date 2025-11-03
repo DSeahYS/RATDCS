@@ -1,0 +1,204 @@
+# RATDCS Development Configuration
+# Optimized for local development and debugging
+
+system:
+  environment: "development"
+  log_level: "DEBUG"
+
+# Development Detection Services (lighter resources)
+detection:
+  asteroid:
+    batch_size: 8
+    max_queue_size: 100
+    gpu_memory_fraction: 0.5
+    
+  exoplanet:
+    batch_size: 16
+    
+  debris:
+    prediction_horizon_hours: 24
+    monte_carlo_samples: 50
+
+# Development Decision Services
+decision:
+  rl_controller:
+    action_frequency_hz: 10
+    
+  fault_tolerant:
+    detection_latency_ms: 200
+
+# Development Kafka Configuration (single broker)
+kafka:
+  bootstrap_servers:
+    - "localhost:9092"
+  consumer_group: "ratdcs-dev"
+  auto_offset_reset: "latest"
+  
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  username: "guest"
+  password: "guest"
+
+# Development Database Configuration
+database:
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "ratdcs_dev"
+    username: "ratdcs_dev"
+    password: "dev_password"
+    pool_size: 5
+    max_overflow: 5
+    echo: true  # Log SQL queries
+    
+  influxdb:
+    url: "http://localhost:8086"
+    org: "ratdcs-dev"
+    bucket: "telemetry-dev"
+    
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 1  # Different DB for dev
+
+# Development API Configuration
+api:
+  host: "127.0.0.1"
+  port: 8000
+  workers: 1
+  reload: true  # Auto-reload on code changes
+  access_log: true
+  cors_enabled: true
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+    - "http://127.0.0.1:3000"
+  rate_limit_per_minute: 100
+  max_request_size_mb: 5
+
+# Development gRPC Configuration
+grpc:
+  server_port: 50051
+  max_workers: 2
+
+# Development Monitoring (optional)
+monitoring:
+  prometheus:
+    enabled: false
+    port: 9090
+    
+  jaeger:
+    enabled: false
+    
+  grafana:
+    enabled: false
+
+# Relaxed Performance Targets for Dev
+performance:
+  latency_targets_ms:
+    asteroid_detector: 500
+    exoplanet_classifier: 600
+    debris_predictor: 700
+    rl_controller: 100
+    fault_detection: 200
+    end_to_end_pipeline: 1000
+
+# Development Logging (verbose)
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    detailed:
+      format: "%(asctime)s | %(levelname)-8s | %(name)-30s | %(funcName)-20s | %(lineno)-4d | %(message)s"
+    simple:
+      format: "%(levelname)s: %(message)s"
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      level: "DEBUG"
+      formatter: "detailed"
+      stream: "ext://sys.stdout"
+    file:
+      class: "logging.FileHandler"
+      level: "DEBUG"
+      formatter: "detailed"
+      filename: "data/logs/development.log"
+      mode: "w"  # Overwrite on restart
+  loggers:
+    ratdcs:
+      level: "DEBUG"
+      handlers: ["console", "file"]
+      propagate: false
+    tensorflow:
+      level: "WARNING"
+    torch:
+      level: "WARNING"
+    kafka:
+      level: "WARNING"
+  root:
+    level: "DEBUG"
+    handlers: ["console"]
+
+# Development Security (relaxed)
+security:
+  jwt_secret_key: "dev-secret-key-not-for-production"
+  jwt_algorithm: "HS256"
+  jwt_expiration_minutes: 1440  # 24 hours
+  api_key_enabled: false
+  tls_enabled: false
+
+# Development Data Pipeline
+data_pipeline:
+  preprocessing:
+    normalize: true
+    augmentation_enabled: true  # Enable for training
+    cache_enabled: false  # Disable cache for fresh data
+    prefetch_buffer_size: 2
+  validation:
+    split_ratio: [0.7, 0.15, 0.15]
+    shuffle_buffer_size: 1000
+    random_seed: 12345
+
+# Development-specific settings
+development:
+  mock_data_enabled: true
+  mock_kafka: false
+  mock_grpc: false
+  debug_mode: true
+  profiling_enabled: true
+  hot_reload: true
+  
+# Reduced Resource Requirements for Dev
+resources:
+  asteroid_detector:
+    cpu_request: "1"
+    cpu_limit: "2"
+    memory_request: "2Gi"
+    memory_limit: "4Gi"
+    
+  exoplanet_classifier:
+    cpu_request: "1"
+    cpu_limit: "2"
+    memory_request: "2Gi"
+    memory_limit: "4Gi"
+    
+  debris_predictor:
+    cpu_request: "1"
+    cpu_limit: "2"
+    memory_request: "1Gi"
+    memory_limit: "2Gi"
+    
+  rl_controller:
+    cpu_request: "1"
+    cpu_limit: "2"
+    memory_request: "4Gi"
+    memory_limit: "8Gi"
+
+# Testing Configuration
+testing:
+  unit_tests_enabled: true
+  integration_tests_enabled: true
+  performance_tests_enabled: false
+  test_data_path: "tests/fixtures"
+  mock_external_services: true

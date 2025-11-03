@@ -1,0 +1,67 @@
+# Dockerfile for RATDCS Asteroid Detection Service
+# Multi-stage build for optimized image size
+
+# Stage 1: Base image with CUDA support
+FROM nvidia/cuda:12.2.0-cudnn8-runtime-ubuntu22.04 as base
+
+# Prevent interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3-pip \
+    python3-dev \
+    git \
+    curl \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and install build tools
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+# Stage 2: Dependencies
+FROM base as dependencies
+
+# Copy requirements files
+COPY requirements.txt /tmp/requirements.txt
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+
+# Stage 3: Application
+FROM dependencies as application
+
+# Copy source code
+COPY src/ /app/src/
+COPY models/asteroid_detector/ /app/models/asteroid_detector/
+COPY config/ /app/config/
+
+# Create non-root user for security
+RUN useradd -m -u 1000 ratdcs && \
+    chown -R ratdcs:ratdcs /app
+
+USER ratdcs
+
+# Environment variables
+ENV PYTHONPATH=/app
+ENV MODEL_PATH=/app/models/asteroid_detector/cnn_v1.h5
+ENV BATCH_SIZE=32
+ENV GPU_MEMORY_FRACTION=0.8
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python3 -c "import sys; sys.exit(0)"
+
+# Expose gRPC port
+EXPOSE 50051
+
+# Expose metrics port
+EXPOSE 8080
+
+# Run the asteroid detector service
+CMD ["python3", "-m", "src.detection.asteroid.detector"]
