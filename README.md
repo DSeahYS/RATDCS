@@ -349,19 +349,28 @@ We welcome contributions! Please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for gu
 
 This project is licensed under the MIT License - see the [`LICENSE`](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 👨‍🚀 Author
+
+**Dave Seah Yong Sheng**
+NTU Aerospace Engineering
+Nanyang Technological University, Singapore
+
+- **GitHub**: https://github.com/DSeahYS/RATDCS
+- **Email**: daveseahys@gmail.com
+
+##  Acknowledgments
 
 - **Van der Heijden et al. (2025)** - CNN methodology for asteroid detection
+- **Malik et al. (2022)** - TSFresh feature extraction methodology achieving 0.948 AUC
 - **Zwicky Transient Facility (ZTF)** - Survey data
 - **TESS Mission** - Exoplanet light curves
 - **Space-Track.org** - Orbital debris catalog
 
 ## 📞 Contact & Support
 
-- **Technical Lead**: ratdcs-support@example.com
-- **GitHub**: https://github.com/organization/ratdcs
-- **Documentation**: https://docs.ratdcs.org
-- **Issues**: https://github.com/organization/ratdcs/issues
+- **Project Lead**: Dave Seah Yong Sheng
+- **GitHub Repository**: https://github.com/DSeahYS/RATDCS
+- **Issues**: https://github.com/DSeahYS/RATDCS/issues
 
 ## 🎯 Roadmap
 
