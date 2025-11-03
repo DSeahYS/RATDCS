@@ -1,1 +1,1 @@
-"""RATDCS Grpc Module."""\n
+"""RATDCS gRPC Module."""

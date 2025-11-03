@@ -1,1 +1,1 @@
-"""RATDCS Schemas Module."""\n
+"""RATDCS Schemas Module."""

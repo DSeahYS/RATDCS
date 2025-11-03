@@ -1,1 +1,1 @@
-"""RATDCS Fault Tolerant Module."""\n
+"""RATDCS Fault Tolerant Module."""

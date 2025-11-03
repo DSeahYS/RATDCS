@@ -1,1 +1,1 @@
-"""RATDCS Asteroid Module."""\n
+"""RATDCS Asteroid Module."""

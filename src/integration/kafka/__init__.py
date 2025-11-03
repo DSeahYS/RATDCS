@@ -1,1 +1,1 @@
-"""RATDCS Kafka Module."""\n
+"""RATDCS Kafka Module."""

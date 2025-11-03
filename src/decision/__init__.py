@@ -1,1 +1,1 @@
-"""RATDCS Decision Module."""\n
+"""RATDCS Decision Module."""

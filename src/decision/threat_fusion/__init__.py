@@ -1,1 +1,1 @@
-"""RATDCS Threat Fusion Module."""\n
+"""RATDCS Threat Fusion Module."""

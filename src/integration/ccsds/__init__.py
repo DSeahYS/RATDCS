@@ -1,1 +1,1 @@
-"""RATDCS Ccsds Module."""\n
+"""RATDCS CCSDS Module."""

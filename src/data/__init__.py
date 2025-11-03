@@ -37,4 +37,4 @@ __all__ = [
 ]
 
 __version__ = '1.0.0'
-__author__ = 'RATDCS Team'
+__author__ = 'Dave Seah Yong Sheng, NTU Aerospace Engineering'

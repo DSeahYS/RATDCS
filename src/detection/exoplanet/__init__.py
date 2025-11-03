@@ -1,1 +1,1 @@
-"""RATDCS Exoplanet Module."""\n
+"""RATDCS Exoplanet Module."""
